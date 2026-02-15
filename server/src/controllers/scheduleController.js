@@ -472,16 +472,39 @@ exports.bookSlot = async (req, res) => {
       }
 
       try {
-        await client.query(
-          `INSERT INTO account_transactions
-           (from_account_id, to_account_id, amount, status, description)
-           VALUES ($1, $2, $3, 'completed', $4)`,
-          [
-            patientAccountId,
-            doctorAccountId,
-            fee,
-            `Doctor fee for appointment ${appointment.appointment_id}`,
-          ],
+        const insertCompletedTxnOnce = async (
+          fromAccountId,
+          toAccountId,
+          amount,
+          description,
+        ) => {
+          const exists = await client.query(
+            `SELECT 1
+             FROM account_transactions
+             WHERE status = 'completed'
+               AND from_account_id = $1
+               AND to_account_id = $2
+               AND amount = $3
+               AND COALESCE(description, '') = $4
+             LIMIT 1`,
+            [fromAccountId, toAccountId, amount, description],
+          );
+
+          if (exists.rows.length > 0) return;
+
+          await client.query(
+            `INSERT INTO account_transactions
+             (from_account_id, to_account_id, amount, status, description)
+             VALUES ($1, $2, $3, 'completed', $4)`,
+            [fromAccountId, toAccountId, amount, description],
+          );
+        };
+
+        await insertCompletedTxnOnce(
+          patientAccountId,
+          doctorAccountId,
+          fee,
+          `Doctor fee for appointment ${appointment.appointment_id}`,
         );
 
         if (hospitalFee > 0) {
@@ -493,16 +516,11 @@ exports.bookSlot = async (req, res) => {
             return res.status(400).json({ error: "Missing hospital account" });
           }
 
-          await client.query(
-            `INSERT INTO account_transactions
-             (from_account_id, to_account_id, amount, status, description)
-             VALUES ($1, $2, $3, 'completed', $4)`,
-            [
-              patientAccountId,
-              hospitalAccountId,
-              hospitalFee,
-              `Hospital fee (10%) for appointment ${appointment.appointment_id}`,
-            ],
+          await insertCompletedTxnOnce(
+            patientAccountId,
+            hospitalAccountId,
+            hospitalFee,
+            `Hospital fee (10%) for appointment ${appointment.appointment_id}`,
           );
         }
       } catch (err) {

@@ -314,7 +314,7 @@ BEGIN
   IF EXISTS (
     SELECT 1
     FROM account_transactions
-    WHERE description = ('Appointment payment for appointment ' || NEW.appointment_id)
+    WHERE description LIKE '%appointment ' || NEW.appointment_id || '%'
   ) THEN
     RETURN NEW;
   END IF;
