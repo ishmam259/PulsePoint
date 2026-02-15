@@ -126,11 +126,22 @@ CREATE TABLE appointments (
 CREATE TABLE prescriptions (
   prescription_id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
   appointment_id INT NOT NULL,
-  medicine_name VARCHAR(100),
-  dosage VARCHAR(50),
-  instructions VARCHAR(100),
-  duration_days INT,
-  FOREIGN KEY (appointment_id) REFERENCES appointments(appointment_id) ON DELETE CASCADE
+  doctor_id INT NOT NULL,
+  patient_id INT NOT NULL,
+  notes TEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (appointment_id) REFERENCES appointments(appointment_id) ON DELETE CASCADE,
+  FOREIGN KEY (doctor_id) REFERENCES doctors(user_id),
+  FOREIGN KEY (patient_id) REFERENCES patients(user_id)
+);
+
+CREATE TABLE prescription_medications (
+  medication_id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  prescription_id INT NOT NULL,
+  medicine_name VARCHAR(100) NOT NULL,
+  dosage VARCHAR(50) NOT NULL,
+  duration VARCHAR(50),
+  FOREIGN KEY (prescription_id) REFERENCES prescriptions(prescription_id) ON DELETE CASCADE
 );
 
 CREATE TABLE medical_history (

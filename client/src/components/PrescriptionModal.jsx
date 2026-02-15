@@ -208,7 +208,18 @@ export default function PrescriptionModal({ appointment, onClose }) {
             <button
               type="submit"
               disabled={createMutation.isPending}
-              className="inline-flex items-center justify-center h-10 px-6 rounded-lg text-sm font-semibold bg-emerald-500 hover:bg-emerald-600 text-white transition-colors shadow-lg shadow-emerald-500/20"
+              className="bg-[#3AAFA9] hover:bg-[#2d9d97] text-white transition-colors"
+              style={{
+                height: "42px",
+                padding: "0 24px",
+                borderRadius: "12px",
+                fontSize: "14px",
+                fontWeight: 700,
+                border: "none",
+                cursor: "pointer",
+                whiteSpace: "nowrap",
+                boxShadow: "0 4px 6px -1px rgba(58, 175, 169, 0.2)"
+              }}
             >
               {createMutation.isPending ? "Creating..." : "Save Prescription"}
             </button>

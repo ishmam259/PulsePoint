@@ -87,6 +87,31 @@ CREATE TABLE IF NOT EXISTS notifications (
 ALTER TABLE hospitals ADD COLUMN IF NOT EXISTS location VARCHAR(100);
 ALTER TABLE chambers ADD COLUMN IF NOT EXISTS location VARCHAR(100);
 
+-- Prescriptions v2 (multi-medication support)
+CREATE TABLE IF NOT EXISTS prescription_medications (
+  medication_id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  prescription_id INT NOT NULL,
+  medicine_name VARCHAR(100) NOT NULL,
+  dosage VARCHAR(50) NOT NULL,
+  duration VARCHAR(50),
+  FOREIGN KEY (prescription_id) REFERENCES prescriptions(prescription_id) ON DELETE CASCADE
+);
+
+ALTER TABLE prescriptions ADD COLUMN IF NOT EXISTS doctor_id INT;
+ALTER TABLE prescriptions ADD COLUMN IF NOT EXISTS patient_id INT;
+ALTER TABLE prescriptions ADD COLUMN IF NOT EXISTS notes TEXT;
+ALTER TABLE prescriptions ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
+ALTER TABLE prescriptions DROP CONSTRAINT IF EXISTS prescriptions_doctor_fk;
+ALTER TABLE prescriptions
+  ADD CONSTRAINT prescriptions_doctor_fk
+  FOREIGN KEY (doctor_id) REFERENCES doctors(user_id);
+
+ALTER TABLE prescriptions DROP CONSTRAINT IF EXISTS prescriptions_patient_fk;
+ALTER TABLE prescriptions
+  ADD CONSTRAINT prescriptions_patient_fk
+  FOREIGN KEY (patient_id) REFERENCES patients(user_id);
+
 -- Ensure user roles include hospital_admin (older DBs may not)
 ALTER TABLE users DROP CONSTRAINT IF EXISTS users_role_check;
 ALTER TABLE users

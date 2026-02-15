@@ -54,13 +54,13 @@ export default function PatientMedicalRecords({ userId }) {
   const getIcon = (type) => {
     switch (type) {
       case "Report":
-        return "📄";
+        return "";
       case "Prescription":
-        return "💊";
+        return "";
       case "Lab":
-        return "🧪";
+        return "";
       default:
-        return "📁";
+        return "";
     }
   };
 
@@ -78,7 +78,6 @@ export default function PatientMedicalRecords({ userId }) {
           <div className="bg-slate-900 border border-white/10 rounded-2xl p-6 w-full max-w-lg shadow-2xl relative overflow-hidden">
             <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-teal-500 to-emerald-500"></div>
             <h3 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
-              <span className="p-2 rounded-lg bg-teal-500/10 text-teal-400">📄</span>
               Add New Record
             </h3>
             <form onSubmit={handleSubmit} className="space-y-5">
@@ -251,7 +250,9 @@ export default function PatientMedicalRecords({ userId }) {
         {records?.length === 0 && (
           <div className="col-span-full flex flex-col items-center justify-center py-16 text-center bg-slate-50/50 dark:bg-slate-800/20 rounded-2xl border border-dashed border-slate-200 dark:border-slate-700/50">
             <div className="w-16 h-16 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mb-4 shadow-sm">
-              <span className="text-3xl grayscale opacity-50">📁</span>
+              <svg className="w-8 h-8 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
             </div>
             <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-1">No records found</h3>
             <p className="text-slate-500 dark:text-slate-400 text-sm max-w-sm">
