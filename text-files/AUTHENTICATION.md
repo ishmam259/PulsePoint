@@ -2,7 +2,7 @@
 
 ## Overview
 
-The application now includes a complete authentication system with JWT tokens, role-based access control, and protected routes.
+The application now includes a complete authentication system with JWT tokens, role-based access control & protected routes.
 
 ## Demo Accounts
 
@@ -29,7 +29,7 @@ All demo accounts use the password: **password123**
   - JWT token generation
   - Role selection (patient/doctor)
 
-**Request Body** (Patient):
+**Request Body** (for Patient):
 
 ```json
 {
@@ -44,7 +44,7 @@ All demo accounts use the password: **password123**
 }
 ```
 
-**Request Body** (Doctor):
+**Request Body** (for Doctor):
 
 ```json
 {
@@ -69,7 +69,7 @@ All demo accounts use the password: **password123**
 - **Features**:
   - Email & password verification
   - Account status check (active/inactive)
-  - JWT token with 7-day expiration
+  - JWT token with 7-day expiration limit
   - Last login timestamp update
 
 **Request**:
@@ -102,12 +102,12 @@ All demo accounts use the password: **password123**
 
 ### 3. Protected Routes
 
-All API endpoints (except /auth/register and /auth/login) require authentication.
+All API endpoints (except /auth/register & /auth/login) require authentication.
 
 **Authorization Header**:
 
 ```
-Authorization: Bearer <your_jwt_token>
+Authorization: Bearer <user_jwt_token>
 ```
 
 ### 4. Role-Based Access Control
@@ -205,9 +205,9 @@ api.interceptors.response.use(
 
 ### 4. Navigation Component
 
-- Shows user name and role in navbar
+- Shows user name & role in navbar
 - Displays role-specific menu items
-- Logout button removes token and redirects
+- Logout button removes token & redirects
 
 ## Security Features
 
@@ -239,7 +239,7 @@ api.interceptors.response.use(
 
 ## Database Schema Updates
 
-### users Table (Updated)
+### users Table
 
 ```sql
 CREATE TABLE users (
@@ -283,11 +283,11 @@ npm run dev
 
 3. **Login as Patient**: Use `patient@test.com` / `password123`
    - Verify patient menu items visible
-   - Access `/search-doctors` and `/my-appointments`
+   - Access `/search-doctors` & `/my-appointments`
 
 4. **Login as Doctor**: Use `doctor@test.com` / `password123`
    - Verify doctor menu items visible
-   - Access `/appointments` and `/prescriptions`
+   - Access `/appointments` & `/prescriptions`
 
 5. **Login as Admin**: Use `admin@pulsepoint.com` / `password123`
    - Verify admin has access to all routes

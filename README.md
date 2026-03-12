@@ -1,74 +1,69 @@
-# 🏥 PulsePoint - Hospital Management System
+# PulsePoint — Hospital Management System
 
-A comprehensive Hospital Management System built with the PERN stack (PostgreSQL, Express.js, React, Node.js) for managing hospital operations, patient records, doctor information, appointments, prescriptions, and medical history.
+Hospital Management System built with the PERN stack (PostgreSQL + Express + React + Node). It supports patients, doctors, admins, appointments, prescriptions, medical history, and an “advanced booking” flow (schedules → slots → triage → notifications).
 
-## 📋 Features
+## Repo layout
 
-- **Dashboard**: Overview of system statistics and recent appointments
-- **Patient Management**: Add, edit, view, and delete patient records
-- **Doctor Management**: Manage doctor profiles with specializations and degrees
-- **Appointment Scheduling**: Schedule and manage appointments between patients and doctors
-- **Hospital Management**: Manage hospital information and associated doctors
-- **Prescription Management**: Create and track prescriptions for appointments
-- **Medical History**: Maintain detailed medical history records for patients
-- **Departments & Specializations**: Organize doctors by departments and specializations
-- **Chambers Management**: Track doctor chambers/clinics
+- `server/` — Express API (default: `http://localhost:5000`)
+- `client/` — React + Vite app (default: `http://localhost:5173`)
+- `schema.sql` — base DB schema
+- `schema_enhancements.sql` — advanced booking tables/triggers
+- `demo_users.sql` — demo accounts
+- `AUTHENTICATION.md`, `ADVANCED_FEATURES.md`, `SETUP.md`, `QUICKSTART.md` — additional docs
 
-## 🛠️ Tech Stack
+## Prerequisites
 
-### Backend
+- Node.js 16+ (Node 18+ recommended)
+- PostgreSQL 13+
+- `psql` available in PATH (or use pgAdmin/DBeaver to run SQL files)
 
-- **Node.js** - Runtime environment
-- **Express.js** - Web framework
-- **PostgreSQL** - Relational database
-- **pg** - PostgreSQL client
+## Quick start (Windows)
 
-### Frontend
-
-- **React 19** - UI library
-- **React Router DOM** - Routing
-- **TanStack Query (React Query)** - Data fetching and caching
-- **Axios** - HTTP client
-- **Tailwind CSS** - Styling
-- **Vite** - Build tool
-
-## 📦 Installation
-
-### Prerequisites
-
-- Node.js (v16 or higher)
-- PostgreSQL (v13 or higher)
-- npm or yarn
-
-### Database Setup
-
-1. Create a PostgreSQL database:
+### 1) Create DB + load schema
 
 ```sql
 CREATE DATABASE hospital_management;
 ```
 
-2. Run the schema file to create tables:
+From the project root:
 
 ```bash
 psql -U postgres -d hospital_management -f schema.sql
+psql -U postgres -d hospital_management -f schema_enhancements.sql
 ```
 
-### Backend Setup
+Optional (only if you are upgrading an older DB):
 
-1. Navigate to the server directory:
+```bash
+psql -U postgres -d hospital_management -f auth_migration.sql
+```
+
+### 2) Seed minimal reference data (required for demo users)
+
+`demo_users.sql` expects a department with `dept_id = 1`.
+
+If you’re starting from a fresh DB, run this once before `demo_users.sql` (it will become `dept_id = 1` on an empty table):
+
+```sql
+INSERT INTO departments (name) VALUES ('General') ON CONFLICT DO NOTHING;
+```
+
+If your `departments` table already has rows, either ensure there is a row with `dept_id = 1`, or update `demo_users.sql` to reference an existing `dept_id`.
+
+Then load demo users:
+
+```bash
+psql -U postgres -d hospital_management -f demo_users.sql
+```
+
+### 3) Run the backend
 
 ```bash
 cd server
-```
-
-2. Install dependencies:
-
-```bash
 npm install
 ```
 
-3. Create a `.env` file in the server directory:
+Create `server/.env`:
 
 ```env
 PORT=5000
@@ -79,125 +74,59 @@ DB_USER=postgres
 DB_PASSWORD=your_password
 ```
 
-4. Start the server:
+Start the API:
 
 ```bash
 npm run dev
 ```
 
-The server will run on `http://localhost:5000`
+Health check: `GET http://localhost:5000/health`
 
-### Frontend Setup
-
-1. Navigate to the client directory:
+### 4) Run the frontend
 
 ```bash
 cd client
-```
-
-2. Install dependencies:
-
-```bash
 npm install
+npm run dev
 ```
 
-3. The `.env` file is already configured:
+The frontend is configured to call the API via `client/.env`:
 
 ```env
 VITE_API_URL=http://localhost:5000/api
 ```
 
-4. Start the development server:
+## Demo accounts
 
-```bash
-npm run dev
-```
+All demo accounts use the password: `password123`
 
-The application will open at `http://localhost:5173`
+| Role    | Email                |
+| ------- | -------------------- |
+| Admin   | admin@pulsepoint.com |
+| Doctor  | doctor@test.com      |
+| Doctor  | dr.jones@test.com    |
+| Doctor  | dr.wilson@test.com   |
+| Patient | patient@test.com     |
+| Patient | jane.doe@test.com    |
 
-## 🗄️ Database Schema
+## API base routes
 
-The system includes the following main entities:
+- Base path: `http://localhost:5000/api`
+- Auth: `/api/auth/*` (JWT)
+- Core modules: `/api/users`, `/api/patients`, `/api/doctors`, `/api/appointments`, `/api/prescriptions`, `/api/hospitals`, etc.
 
-- **Users**: Base table for all user information
-- **Patients**: Patient-specific information
-- **Doctors**: Doctor-specific information with codes and fees
-- **Departments**: Hospital departments
-- **Specializations**: Medical specializations
-- **Doctor Specializations**: Many-to-many relationship
-- **Doctor Degrees**: Educational qualifications
-- **Hospitals**: Hospital information
-- **Hospital Doctors**: Doctor-hospital associations
-- **Chambers**: Doctor private chambers/clinics
-- **Appointments**: Patient-doctor appointments
-- **Prescriptions**: Medicine prescriptions
-- **Medical History**: Patient medical records
+For auth details and protected routes, see `AUTHENTICATION.md`.
 
-## 🚀 API Endpoints
+## More docs
 
-### Users
+- `QUICKSTART.md` — walkthrough of the main flows
+- `SETUP.md` — detailed setup + troubleshooting
+- `AUTHENTICATION.md` — JWT auth, roles, endpoints
+- `ADVANCED_FEATURES.md` — schedules/slots/triage/notifications
 
-- `GET /api/users` - Get all users
-- `GET /api/users/:id` - Get user by ID
-- `POST /api/users` - Create new user
-- `PUT /api/users/:id` - Update user
-- `DELETE /api/users/:id` - Delete user
+## License
 
-### Patients
-
-- `GET /api/patients` - Get all patients
-- `GET /api/patients/:id` - Get patient by ID
-- `POST /api/patients` - Create new patient
-- `PUT /api/patients/:id` - Update patient
-- `DELETE /api/patients/:id` - Delete patient
-
-### Doctors
-
-- `GET /api/doctors` - Get all doctors
-- `GET /api/doctors/:id` - Get doctor by ID
-- `POST /api/doctors` - Create new doctor
-- `PUT /api/doctors/:id` - Update doctor
-- `DELETE /api/doctors/:id` - Delete doctor
-
-### Appointments
-
-- `GET /api/appointments` - Get all appointments
-- `GET /api/appointments/:id` - Get appointment by ID
-- `GET /api/appointments/doctor/:doctorId` - Get appointments by doctor
-- `GET /api/appointments/patient/:patientId` - Get appointments by patient
-- `POST /api/appointments` - Create new appointment
-- `PUT /api/appointments/:id` - Update appointment
-- `DELETE /api/appointments/:id` - Delete appointment
-
-### Hospitals, Prescriptions, Medical History, and more...
-
-## 📱 Usage
-
-1. **Dashboard**: View system overview and recent appointments
-2. **Add Patients**: Register new patients with personal and medical information
-3. **Add Doctors**: Register doctors with specializations and consultation fees
-4. **Schedule Appointments**: Book appointments between patients and doctors
-5. **Manage Hospitals**: Add and manage hospital information
-6. **Create Prescriptions**: Add prescriptions for completed appointments
-7. **Track Medical History**: Maintain comprehensive medical records
-
-## 🎓 DBMS Project Features
-
-This project demonstrates:
-
-- ✅ Complex relational database design
-- ✅ Foreign key relationships and constraints
-- ✅ Database indexing for performance
-- ✅ Transaction management
-- ✅ Complex SQL queries with JOINs
-- ✅ Data aggregation and grouping
-- ✅ RESTful API design
-- ✅ Full CRUD operations
-- ✅ Database normalization (3NF)
-
-## 📄 License
-
-This project is licensed under the MIT License.
+This project is licensed under the GNU GPL v3.0 — see `LICENSE`.
 
 ---
 
