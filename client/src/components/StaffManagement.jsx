@@ -126,7 +126,7 @@ export default function StaffManagement() {
         </div>
         <button
           onClick={() => setShowAddModal(true)}
-          className="bg-[#3AAFA9] hover:bg-[#2d9a94] text-white px-6 py-3 rounded-xl font-semibold transition-colors flex items-center gap-2 shadow-lg shadow-[#3AAFA9]/20"
+          className="flex h-14 items-center gap-2 rounded-2xl bg-[#3AAFA9] px-6 text-base font-semibold text-white shadow-lg shadow-[#3AAFA9]/25 transition-colors hover:bg-[#2d9a94]"
         >
           <svg
             className="w-5 h-5"
@@ -148,12 +148,12 @@ export default function StaffManagement() {
       {/* Doctors List */}
       <div className="bg-white/70 dark:bg-slate-800/70 backdrop-blur-md border border-slate-200/50 dark:border-slate-700/50 rounded-xl overflow-hidden">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between px-5 py-4 border-b border-slate-200/50 dark:border-slate-700/50">
-          <div className="text-sm text-slate-500 dark:text-slate-400">
+          <div className="inline-flex h-14 min-w-30 items-center rounded-2xl border border-slate-200/60 bg-white/80 px-5 text-sm font-medium text-slate-500 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60 dark:text-slate-400">
             {filteredMyDoctors.length} doctors
           </div>
-          <div className="relative w-full sm:w-72">
+          <div className="relative w-full sm:w-80">
             <svg
-              className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"
+              className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -167,10 +167,10 @@ export default function StaffManagement() {
             </svg>
             <input
               type="text"
-              placeholder="Search staff..."
+              placeholder=""
               value={staffSearch}
               onChange={(e) => setStaffSearch(e.target.value)}
-              className="w-full pl-9 pr-3 py-2 bg-white/80 dark:bg-slate-900/60 border border-slate-200/60 dark:border-slate-700/60 rounded-lg text-sm text-slate-700 dark:text-slate-200 placeholder-slate-400"
+              className="h-14 w-full rounded-2xl border border-slate-200/60 bg-white/80 pl-11 pr-4 text-sm text-slate-700 placeholder-slate-400 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60 dark:text-slate-200"
             />
           </div>
         </div>

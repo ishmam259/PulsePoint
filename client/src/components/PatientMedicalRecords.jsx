@@ -110,7 +110,7 @@ export default function PatientMedicalRecords({ userId }) {
           <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-2xl p-12 w-2/3 shadow-xl relative overflow-hidden">
             <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-teal-500 to-emerald-500"></div>
             <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-6 flex items-center gap-2">
-              <span className="p-2 rounded-lg bg-teal-500/10 text-teal-400">📄</span>
+              <span className="p-2 rounded-lg bg-teal-500/10 text-teal-400"></span>
               Add New Record
             </h3>
             <form onSubmit={handleSubmit} className="space-y-5">

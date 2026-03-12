@@ -24,6 +24,68 @@ function normalizePrescriptionPayload(body = {}) {
   return [];
 }
 
+function parseDurationDays(durationValue) {
+  if (!durationValue || typeof durationValue !== "string") {
+    return null;
+  }
+
+  const normalized = durationValue.trim().toLowerCase();
+  const match = normalized.match(
+    /^(\d+)\s*(day|days|week|weeks|month|months)$/i,
+  );
+
+  if (!match) {
+    return null;
+  }
+
+  const amount = Number(match[1]);
+  const unit = match[2].toLowerCase();
+
+  if (unit.startsWith("day")) {
+    return amount;
+  }
+
+  if (unit.startsWith("week")) {
+    return amount * 7;
+  }
+
+  if (unit.startsWith("month")) {
+    return amount * 30;
+  }
+
+  return null;
+}
+
+function getMedicationEndDate(durationValue, createdAt) {
+  if (
+    typeof durationValue === "string" &&
+    /^\d{4}-\d{2}-\d{2}$/.test(durationValue)
+  ) {
+    return new Date(`${durationValue}T23:59:59`);
+  }
+
+  const durationDays = parseDurationDays(durationValue);
+  if (durationDays !== null) {
+    const endDate = new Date(createdAt);
+    endDate.setDate(endDate.getDate() + durationDays);
+    endDate.setHours(23, 59, 59, 999);
+    return endDate;
+  }
+
+  const fallbackEndDate = new Date(createdAt);
+  fallbackEndDate.setDate(fallbackEndDate.getDate() + 30);
+  fallbackEndDate.setHours(23, 59, 59, 999);
+  return fallbackEndDate;
+}
+
+function getDaysLeft(endDate) {
+  const millisecondsPerDay = 24 * 60 * 60 * 1000;
+  return Math.max(
+    0,
+    Math.ceil((endDate.getTime() - Date.now()) / millisecondsPerDay),
+  );
+}
+
 exports.getAllPrescriptions = async (req, res) => {
   const client = await pool.connect();
   try {
@@ -240,7 +302,6 @@ exports.deletePrescription = async (req, res) => {
     const doctor_id = req.user?.userId;
 
     if (!doctor_id) {
-      client.release();
       return res.status(401).json({ error: "Authentication required" });
     }
 
@@ -250,12 +311,10 @@ exports.deletePrescription = async (req, res) => {
     );
 
     if (presRes.rows.length === 0) {
-      client.release();
       return res.status(404).json({ error: "Prescription not found" });
     }
 
     if (presRes.rows[0].doctor_id !== doctor_id) {
-      client.release();
       return res.status(403).json({ error: "Unauthorized access" });
     }
 
@@ -343,20 +402,13 @@ exports.getPrescriptionsByPatient = async (req, res) => {
     // UI expects list of MEDICINES with metadata.
     // Let's flatten it.
     const flattened = [];
-    const oneMonth = 30 * 24 * 60 * 60 * 1000;
 
     for (const p of prescriptions) {
-      const diff = new Date() - new Date(p.created_at);
-      const status = diff < oneMonth ? "ongoing" : "past";
-      const days_left = Math.max(
-        0,
-        30 - Math.floor(diff / (24 * 60 * 60 * 1000)),
-      );
-      const end_date = new Date(
-        new Date(p.created_at).getTime() + oneMonth,
-      ).toLocaleDateString();
-
       for (const med of p.medications) {
+        const endDate = getMedicationEndDate(med.duration, p.created_at);
+        const days_left = getDaysLeft(endDate);
+        const status = days_left > 0 ? "ongoing" : "past";
+
         flattened.push({
           prescription_id: p.prescription_id, // non-unique if multiple meds per rx
           medicine_name: med.medicine_name,
@@ -365,7 +417,7 @@ exports.getPrescriptionsByPatient = async (req, res) => {
           status: status,
           days_left: days_left,
           doctor_name: p.doctor_name,
-          end_date: end_date,
+          end_date: endDate.toLocaleDateString(),
         });
       }
     }

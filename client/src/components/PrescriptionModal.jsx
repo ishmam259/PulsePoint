@@ -4,8 +4,9 @@ import { prescriptionsAPI } from "../services/api";
 
 export default function PrescriptionModal({ appointment, onClose }) {
   const queryClient = useQueryClient();
+  const appointmentDate = appointment?.appt_date?.split("T")[0] || "";
   const [medications, setMedications] = useState([
-    { medicine_name: "", dosage: "", duration: "" },
+    { medicine_name: "", dosage: "", duration: appointmentDate },
   ]);
   const [notes, setNotes] = useState("");
   const [error, setError] = useState("");
@@ -13,7 +14,7 @@ export default function PrescriptionModal({ appointment, onClose }) {
   const addMedication = () => {
     setMedications([
       ...medications,
-      { medicine_name: "", dosage: "", duration: "" },
+      { medicine_name: "", dosage: "", duration: appointmentDate },
     ]);
   };
 
@@ -149,10 +150,10 @@ export default function PrescriptionModal({ appointment, onClose }) {
                 </div>
                 <div className="col-span-3">
                   <input
-                    type="text"
-                    placeholder="Duration"
+                    type="date"
                     className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-slate-900 dark:text-white text-sm focus:border-emerald-500 outline-none"
                     value={med.duration}
+                    min={appointmentDate}
                     onChange={(e) =>
                       updateMedication(index, "duration", e.target.value)
                     }
@@ -191,7 +192,7 @@ export default function PrescriptionModal({ appointment, onClose }) {
             </h3>
             <textarea
               placeholder="Additional instructions, diagnosis, etc."
-              className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-4 py-3 text-slate-900 dark:text-white text-sm focus:border-emerald-500 outline-none min-h-[100px]"
+              className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-4 py-3 text-slate-900 dark:text-white text-sm focus:border-emerald-500 outline-none min-h-25"
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
             />
@@ -218,7 +219,7 @@ export default function PrescriptionModal({ appointment, onClose }) {
                 border: "none",
                 cursor: "pointer",
                 whiteSpace: "nowrap",
-                boxShadow: "0 4px 6px -1px rgba(58, 175, 169, 0.2)"
+                boxShadow: "0 4px 6px -1px rgba(58, 175, 169, 0.2)",
               }}
             >
               {createMutation.isPending ? "Creating..." : "Save Prescription"}
